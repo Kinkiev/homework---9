@@ -3,8 +3,8 @@ def help() -> str:
            "- hello\n" \
            "- add [name] [phone]\n" \
            "- change [name] [phone]\n" \
-           "- phone [name]\n" \
-           "- show all\n" \
+           "- find [name]\n" \
+           "- show_all\n" \
            "- help \n" \
            "- good bye, close, exit"
 
@@ -67,35 +67,30 @@ def hello() -> str:
 def close() -> str:
     return "Good bye!"
 
+commands = {
+    "hello": hello,
+    "add": add,
+    "change": change,
+    "find": find,
+    "show_all": show_all,
+    "help": help,
+    "good bye": close,
+    "close": close,
+    "exit": close
+}
+
 @input_error
-def parser(text: str) -> tuple[callable, tuple[str]]: 
+def parser(text: str) -> tuple[callable, tuple[str]]:
     text_lower = text.lower()
-    if text_lower == "hello":
-        return hello, ()
-    elif text_lower.startswith("add"):
-        command, args = add, text_lower.replace("add", "").strip().split()  #скажу відверто я не дуже зрозумів ось  цієї вашої конструкції але воно працює
-        if len(args) != 2:
-            raise ValueError
-        return command, tuple(args)
-    elif text_lower.startswith("change"):
-        command, args = change, text_lower.replace("change", "").strip().split() #перевірку інших умов я зробив по аналогії 
-        if len(args) != 2:
-            raise ValueError
-        return command, tuple(args)
-    elif text_lower.startswith("find"):
-        command, args = find, (text_lower.replace("find", "").strip(),) # і тут теж :) 
-        if len(args[0]) == 0:
-            raise ValueError
+    words = text_lower.split()
+    
+    if words[0] in commands:
+        command = commands[words[0]]
+        args = tuple(words[1:])
         return command, args
-    elif text_lower == "show all":
-        return show_all, ()
-    elif text_lower == "help": #додав коротку функцію для допомоги користувачу 
-        return help, ()
-    elif text_lower in ["good bye", "close", "exit"]:
-        return close, ()
-    else:
-        return no_command, ()
-        
+    
+    return no_command, ()
+
 def main(): 
     while True: 
         user_input = input (">>>")
